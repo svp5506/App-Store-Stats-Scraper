@@ -3,6 +3,7 @@ import requests
 import json
 import pandas as pd
 from datetime import datetime
+import concurrent.futures
 
 url = ["https://apps.apple.com/us/app/go-kinetic-by-windstream/id1342262959", #GoKinectByWindstream
     "https://apps.apple.com/us/app/my-altafiber/id1245014739", #MyAltafiber
@@ -42,9 +43,9 @@ url = ["https://apps.apple.com/us/app/go-kinetic-by-windstream/id1342262959", #G
     "https://apps.apple.com/us/app/my-blue-ridge/id1425929491", #MyBlueRidge
     "https://apps.apple.com/us/app/mybuckeye/id1571340716" #MyBuckeye
 ]
-dataiOS = []
-for link in range(len(url)):
-    result = requests.get(url[link])
+
+def fetch_data(url):
+    result = requests.get(url)
     soup = BeautifulSoup(result.content, "html.parser")
     rank_element = soup.find('a', {'class': 'inline-list__item'})
     rank = None
@@ -54,22 +55,29 @@ for link in range(len(url)):
         rank = int(rank_text.replace(',', '').replace('#', ''))
     script = soup.find(type="application/ld+json").text.strip()
     data = json.loads(script)
-    
+
     app_rating = None
     review_count = None
     if 'aggregateRating' in data:
         app_rating = data['aggregateRating'].get('ratingValue')
         review_count = data['aggregateRating'].get('reviewCount')
-    
+
     dataApp = {
         "App Name": data.get('name'),
         "iOS App Rating": app_rating,
-        "iOS Review Count": review_count,
+        "iOS Total Reviews": review_count,
         "iOS Rank": rank
     }
-    dataiOS.append(dataApp)
+    return dataApp
+
+dataiOS = []
+with concurrent.futures.ThreadPoolExecutor() as executor:
+    futures = [executor.submit(fetch_data, link) for link in url]
+    for future in concurrent.futures.as_completed(futures):
+        dataApp = future.result()
+        dataiOS.append(dataApp)
 
 dataiOS = pd.DataFrame(dataiOS)
 now = datetime.now()
 dataiOS.insert(0, 'Date', now.strftime("%Y-%m-%d %H:%M:%S"))
-dataiOS.to_excel('iOSratings.xlsx')
+dataiOS.to_excel('iOSratings.xlsx', index=False)

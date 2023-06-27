@@ -2,6 +2,7 @@ from bs4 import BeautifulSoup
 import requests
 import pandas as pd
 from datetime import datetime
+import concurrent.futures
 
 urlAndroid = [
     "https://play.google.com/store/apps/details?id=com.windstream.residential&hl=en_US&gl=US", #Windstream
@@ -42,10 +43,10 @@ urlAndroid = [
     "https://play.google.com/store/apps/details?id=com.brctv.myblueridge&hl=en_US&gl=US", #MyBlueRidge
     "https://play.google.com/store/apps/details?id=com.buckeyebroadband.mybuckeye&hl=en_US&gl=US" #MyBuckeye
 ]
-dataAndroid = []
-for link in urlAndroid:
+
+def process_url(link):
     resultAndroid = requests.get(link)
-    soupAndroid = BeautifulSoup(resultAndroid.content, "html.parser")
+    soupAndroid = BeautifulSoup(resultAndroid.content, "lxml")
     starRatingRaw = soupAndroid.find("div", {"class": "TT9eCd"})
 
     if starRatingRaw is not None:
@@ -68,9 +69,19 @@ for link in urlAndroid:
             countReviews = countReviewsRaw.replace(",", "")
             temp_list[i + 1] = int(countReviews)
 
-    dataAndroid.append(temp_list)
+    return temp_list
 
-dataAndroid = pd.DataFrame(dataAndroid, columns=['Date', 'Android 5 Star Reviews', 'Android 4 Star Reviews', 'Android 3 Star Reviews', 'Android 2 Star Reviews', 'Android 1 Star Reviews', 'Android App Rating', 'App Name'])
+dataAndroid = []
+with concurrent.futures.ThreadPoolExecutor() as executor:
+    futures = []
+    for link in urlAndroid:
+        futures.append(executor.submit(process_url, link))
+    
+    for future in concurrent.futures.as_completed(futures):
+        temp_list = future.result()
+        dataAndroid.append(temp_list)
+
+dataAndroid = pd.DataFrame(dataAndroid, columns=['Date_A', 'Android 5 Star Reviews', 'Android 4 Star Reviews', 'Android 3 Star Reviews', 'Android 2 Star Reviews', 'Android 1 Star Reviews', 'Android App Rating', 'App Name'])
 
 dataAndroid['Android Total Reviews'] = dataAndroid.loc[:, 'Android 5 Star Reviews':'Android 1 Star Reviews'].sum(1)
 dataAndroid = dataAndroid[['Date_A', 'App Name', 'Android App Rating', 'Android Total Reviews', 'Android 5 Star Reviews', 'Android 4 Star Reviews', 'Android 3 Star Reviews', 'Android 2 Star Reviews', 'Android 1 Star Reviews']]
