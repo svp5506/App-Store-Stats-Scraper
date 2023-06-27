@@ -67,7 +67,6 @@ def process_url(link):
             countReviewsRaw = div['title']
             countReviews = countReviewsRaw.replace(",", "")
             temp_list[i + 1] = int(countReviews)
-
     return temp_list
 
 dataAndroid = []
@@ -75,9 +74,10 @@ for link in urlAndroid:
     temp_list = process_url(link)
     dataAndroid.append(temp_list)
 
-dataAndroid = pd.DataFrame(dataAndroid, columns=['Date_A', 'Android 5 Star Reviews', 'Android 4 Star Reviews', 'Android 3 Star Reviews', 'Android 2 Star Reviews', 'Android 1 Star Reviews', 'Android App Rating', 'App Name'])
+dataAndroid = pd.DataFrame(dataAndroid, columns=['Date', '5 Star Reviews', '4 Star Reviews', '3 Star Reviews', '2 Star Reviews', '1 Star Reviews', 'Android App Rating', 'App Name'],
+                           index = ['GKW','MAF','SAEM','CA','MV','MC','MD','TM','XM','SNLS','MSA','MSP','VMF','MCL','VM','SU','STVA','ATT','SSLG','MDCM','MM','MFR','XF','GFBR','MVIA','ARM','ASTRCN','HUGH','HTMYA','MIDCO','OPTS','USCELL','SEC','OPTTV','BRE','BLUER','BUCK'])
 
-dataAndroid['Android Total Reviews'] = dataAndroid.loc[:, 'Android 5 Star Reviews':'Android 1 Star Reviews'].sum(1)
-dataAndroid = dataAndroid[['Date_A', 'App Name', 'Android App Rating', 'Android Total Reviews', 'Android 5 Star Reviews', 'Android 4 Star Reviews', 'Android 3 Star Reviews', 'Android 2 Star Reviews', 'Android 1 Star Reviews']]
+dataAndroid['Android Total Reviews'] = dataAndroid.loc[:, '5 Star Reviews':'1 Star Reviews'].sum(1)
+dataAndroid = dataAndroid[['Date', 'App Name', 'Android App Rating', 'Android Total Reviews', '5 Star Reviews', '4 Star Reviews', '3 Star Reviews', '2 Star Reviews', '1 Star Reviews']]
 
 dataAndroid.to_excel('AndroidRatings.xlsx')

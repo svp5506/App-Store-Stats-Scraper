@@ -12,10 +12,11 @@ dataAndroid = pd.read_excel('androidRatings.xlsx')
 dataAndroid['App Name'] = dataiOS['App Name']
 
 # Merge iOS and Android Dataframes
-dataCombined = pd.merge(dataiOS, dataAndroid, on='App Name', how='outer')
+dataCombined = dataiOS.join(dataAndroid, how='outer', rsuffix='_Android')
 
 # Drop unnecessary columns
-dataCombined.drop(columns=['Date_A', 'Android 5 Star Reviews', 'Android 4 Star Reviews', 'Android 3 Star Reviews', 'Android 2 Star Reviews', 'Android 1 Star Reviews'], inplace=True)
+dataCombined.drop(columns=['Date_Android', '5 Star Reviews', '4 Star Reviews', '3 Star Reviews', '2 Star Reviews', '1 Star Reviews'], inplace=True)
+dataCombined.reset_index(drop= True)
 
 # Convert columns to numeric types
 dataCombined['iOS App Rating'] = pd.to_numeric(dataCombined['iOS App Rating'], errors='coerce')

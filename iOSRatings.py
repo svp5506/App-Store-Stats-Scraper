@@ -74,7 +74,8 @@ for link in url:
     dataApp = fetch_data(link)
     dataiOS.append(dataApp)
 
-dataiOS = pd.DataFrame(dataiOS)
+dataiOS = pd.DataFrame(dataiOS, 
+                       index = ['GKW','MAF','SAEM','CA','MV','MC','MD','TM','XM','SNLS','MSA','MSP','VMF','MCL','VM','SU','STVA','ATT','SSLG','MDCM','MM','MFR','XF','GFBR','MVIA','ARM','ASTRCN','HUGH','HTMYA','MIDCO','OPTS','USCELL','SEC','OPTTV','BRE','BLUER','BUCK'])
 now = datetime.now()
 dataiOS.insert(0, 'Date', now.strftime("%B %d, %Y"))
 dataiOS.to_excel('iOSratings.xlsx')
