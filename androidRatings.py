@@ -73,6 +73,6 @@ for link in urlAndroid:
 dataAndroid = pd.DataFrame(dataAndroid, columns=['Date', 'Android 5 Star Reviews', 'Android 4 Star Reviews', 'Android 3 Star Reviews', 'Android 2 Star Reviews', 'Android 1 Star Reviews', 'Android App Rating', 'App Name'])
 
 dataAndroid['Android Total Reviews'] = dataAndroid.loc[:, 'Android 5 Star Reviews':'Android 1 Star Reviews'].sum(1)
-dataAndroid = dataAndroid[['Date', 'App Name', 'Android App Rating', 'Android Total Reviews', 'Android 5 Star Reviews', 'Android 4 Star Reviews', 'Android 3 Star Reviews', 'Android 2 Star Reviews', 'Android 1 Star Reviews']]
+dataAndroid = dataAndroid[['Date_A', 'App Name', 'Android App Rating', 'Android Total Reviews', 'Android 5 Star Reviews', 'Android 4 Star Reviews', 'Android 3 Star Reviews', 'Android 2 Star Reviews', 'Android 1 Star Reviews']]
 
 dataAndroid.to_excel('AndroidRatings.xlsx', index=False)
