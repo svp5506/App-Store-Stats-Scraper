@@ -1,6 +1,5 @@
 from bs4 import BeautifulSoup
 import requests
-import json
 import pandas as pd
 from datetime import datetime
 
@@ -31,7 +30,7 @@ urlAndroid = [
     "https://play.google.com/store/apps/details?id=com.google.android.apps.fiber.myfiber&hl=en_US&gl=US", #GoogleFiber
     "https://play.google.com/store/apps/details?id=com.viasat.cts.store.ViasatInternet&hl=en_US&gl=US", #MyViasat
     "https://play.google.com/store/apps/details?id=agoc.mobile.account&hl=en_US&gl=US", #ArmStrong
-    "https://play.google.com/store/apps/details?id=com.rcn.mobile&hl=en_US&gl=US", #RCN_Mobile
+    "https://play.google.com/store/apps/details?id=com.astound.mobile.rcn&hl=en_US&gl=US", #RCN_Mobile #Astound_Mobile
     "https://play.google.com/store/apps/details?id=com.hughesnet.HughesNetMobile&hl=en_US&gl=US", #HughesNet_Mobile
     "https://play.google.com/store/apps/details?id=com.hawaiiantel.myht&hl=en_US&gl=US", #HT_MyAccount
     "https://play.google.com/store/apps/details?id=com.midco.consumerapp&hl=en_US&gl=US", #MidcoMyAccount
@@ -44,39 +43,36 @@ urlAndroid = [
     "https://play.google.com/store/apps/details?id=com.buckeyebroadband.mybuckeye&hl=en_US&gl=US" #MyBuckeye
 ]
 dataAndroid = []
-for link in range(len(urlAndroid)):
-    resultAndroid = requests.get(urlAndroid[link])
+for link in urlAndroid:
+    resultAndroid = requests.get(link)
     soupAndroid = BeautifulSoup(resultAndroid.content, "html.parser")
-    starRatingRaw = soupAndroid.find("div",{"class":"TT9eCd"})
-    starRating = starRatingRaw.text.replace("star","")
-    
-    appName = soupAndroid.find("h1",{"itemprop":"name"})
+    starRatingRaw = soupAndroid.find("div", {"class": "TT9eCd"})
+
+    if starRatingRaw is not None:
+        starRating = starRatingRaw.text.replace("star", "")
+    else:
+        starRating = ""
+
+    appName = soupAndroid.find("h1", {"itemprop": "name"})
     appName = appName.text
-    
-    temp_list = []
-    divReviews= soupAndroid.find_all("div",{"class":"RutFAf wcB8se"})
-    for div in divReviews:
-        countReviewsRaw = div['title']
-        countReviews = countReviewsRaw.replace(",","")
-        temp_list.append(countReviews)
-    
-    temp_list.append(starRating)
-    temp_list.append(appName)
+
+    temp_list = [None] * 8
+    temp_list[0] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")  # Date
+    temp_list[6] = starRating  # Star Rating
+    temp_list[7] = appName  # App Name
+
+    divReviews = soupAndroid.find_all("div", {"class": "RutFAf wcB8se"})
+    if divReviews:
+        for i, div in enumerate(divReviews):
+            countReviewsRaw = div['title']
+            countReviews = countReviewsRaw.replace(",", "")
+            temp_list[i + 1] = int(countReviews)
+
     dataAndroid.append(temp_list)
-    
-dataAndroid = pd.DataFrame(dataAndroid, columns=['5 Star Reviews', '4 Star Reviews', '3 Star Reviews', '2 Star Reviews', '1 Star Reviews', 'Star Rating', 'App Name'])
 
-dataAndroid['5 Star Reviews'] = dataAndroid['5 Star Reviews'].astype(int)
-dataAndroid['4 Star Reviews'] = dataAndroid['4 Star Reviews'].astype(int)
-dataAndroid['3 Star Reviews'] = dataAndroid['3 Star Reviews'].astype(int)
-dataAndroid['2 Star Reviews'] = dataAndroid['2 Star Reviews'].astype(int)
-dataAndroid['1 Star Reviews'] = dataAndroid['1 Star Reviews'].astype(int)
-dataAndroid['Total Reviews'] = dataAndroid.loc[:, '5 Star Reviews':'1 Star Reviews'].sum(1)
+dataAndroid = pd.DataFrame(dataAndroid, columns=['Date', 'Android 5 Star Reviews', 'Android 4 Star Reviews', 'Android 3 Star Reviews', 'Android 2 Star Reviews', 'Android 1 Star Reviews', 'Android App Rating', 'App Name'])
 
-dataAndroid = dataAndroid[['App Name', 'App Rating', 'Total Reviews', '5 Star Reviews','4 Star Reviews', '3 Star Reviews', '2 Star Reviews', '1 Star Reviews']]
+dataAndroid['Android Total Reviews'] = dataAndroid.loc[:, 'Android 5 Star Reviews':'Android 1 Star Reviews'].sum(1)
+dataAndroid = dataAndroid[['Date', 'App Name', 'Android App Rating', 'Android Total Reviews', 'Android 5 Star Reviews', 'Android 4 Star Reviews', 'Android 3 Star Reviews', 'Android 2 Star Reviews', 'Android 1 Star Reviews']]
 
-now = datetime.now()
-dataAndroid.insert(0, 'Date', now.strftime("%Y-%m-%d %H:%M:%S"))
-
-print(dataAndroid)
-dataAndroid.to_excel('AndroidRatings.xlsx')
+dataAndroid.to_excel('AndroidRatings.xlsx', index=False)

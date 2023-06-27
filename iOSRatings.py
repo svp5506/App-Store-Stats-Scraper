@@ -30,7 +30,7 @@ url = ["https://apps.apple.com/us/app/go-kinetic-by-windstream/id1342262959", #G
     "https://apps.apple.com/us/app/google-fiber/id1063844759", #GoogleFiber
     "https://apps.apple.com/us/app/my-viasat/id1341120640", #MyViasat
     "https://apps.apple.com/us/app/armstrong/id636522134", #ArmStrong
-    "https://apps.apple.com/us/app/rcn-mobile/id610411414", #RCN_Mobile
+    "https://apps.apple.com/us/app/astound-mobile/id6449095899", #RCN_Mobile #AstoundMobile
     "https://apps.apple.com/us/app/hughesnet-mobile/id1097579916", #HughesNet_Mobile
     "https://apps.apple.com/us/app/ht-my-account/id1262963153", #HT_MyAccount
     "https://apps.apple.com/us/app/midco-my-account/id1090421908", #MidcoMyAccount
@@ -63,15 +63,13 @@ for link in range(len(url)):
     
     dataApp = {
         "App Name": data.get('name'),
-        "App Rating": app_rating,
-        "Review Count": review_count,
-        "Rank": rank
+        "iOS App Rating": app_rating,
+        "iOS Review Count": review_count,
+        "iOS Rank": rank
     }
     dataiOS.append(dataApp)
 
 dataiOS = pd.DataFrame(dataiOS)
 now = datetime.now()
 dataiOS.insert(0, 'Date', now.strftime("%Y-%m-%d %H:%M:%S"))
-
-print(dataiOS)
 dataiOS.to_excel('iOSratings.xlsx')
