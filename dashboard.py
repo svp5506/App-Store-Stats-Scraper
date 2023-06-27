@@ -21,7 +21,7 @@ dfCombined = dfCombined.reset_index(drop=True)
 
 dfiOS = pd.read_excel(iOS_file,
                    sheet_name,
-                   usecols='A:E',
+                   usecols='B:E',
                    header=0
                    )
 dfiOS = dfiOS.sort_values(by=['iOS App Rating'],ascending=False)
@@ -31,7 +31,7 @@ dfiOS = dfiOS.reset_index(drop=True)
 
 dfAndroid = pd.read_excel(Android_file,
                    sheet_name,
-                   usecols='A:I',
+                   usecols='B:J',
                    header=0
                    )
 dfAndroid = dfAndroid.sort_values(by=['Android App Rating'],ascending=False)

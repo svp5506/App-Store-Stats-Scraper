@@ -2,10 +2,13 @@ import pandas as pd
 from datetime import datetime
 
 # Read data from files with specified data types
-dataiOS = pd.read_excel('iOSratings.xlsx', dtype={'App Name': str, 'Date': str, 'iOS App Rating': float, 'iOS Total Reviews': int, 'iOS Rank': str})
-dataAndroid = pd.read_excel('androidRatings.xlsx', dtype={'App Name': str, 'Android App Rating': float, 'Android Total Reviews': int})
+dataiOS = pd.read_excel('iOSratings.xlsx')
+dataAndroid = pd.read_excel('androidRatings.xlsx')
 
-# Overwrite Android App Names with iOS App Names
+# Sort Android ratings by App Name
+# dataAndroid.sort_values('App Name', inplace=True)
+
+#  Overwrite Android App Names with iOS App Names
 dataAndroid['App Name'] = dataiOS['App Name']
 
 # Merge iOS and Android Dataframes

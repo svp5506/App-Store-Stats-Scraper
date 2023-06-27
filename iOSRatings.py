@@ -3,7 +3,6 @@ import requests
 import json
 import pandas as pd
 from datetime import datetime
-import concurrent.futures
 
 url = ["https://apps.apple.com/us/app/go-kinetic-by-windstream/id1342262959", #GoKinectByWindstream
     "https://apps.apple.com/us/app/my-altafiber/id1245014739", #MyAltafiber
@@ -46,7 +45,7 @@ url = ["https://apps.apple.com/us/app/go-kinetic-by-windstream/id1342262959", #G
 
 def fetch_data(url):
     result = requests.get(url)
-    soup = BeautifulSoup(result.content, "html.parser")
+    soup = BeautifulSoup(result.content, "lxml")
     rank_element = soup.find('a', {'class': 'inline-list__item'})
     rank = None
     if rank_element is not None:
@@ -71,13 +70,11 @@ def fetch_data(url):
     return dataApp
 
 dataiOS = []
-with concurrent.futures.ThreadPoolExecutor() as executor:
-    futures = [executor.submit(fetch_data, link) for link in url]
-    for future in concurrent.futures.as_completed(futures):
-        dataApp = future.result()
-        dataiOS.append(dataApp)
+for link in url:
+    dataApp = fetch_data(link)
+    dataiOS.append(dataApp)
 
 dataiOS = pd.DataFrame(dataiOS)
 now = datetime.now()
-dataiOS.insert(0, 'Date', now.strftime("%Y-%m-%d %H:%M:%S"))
-dataiOS.to_excel('iOSratings.xlsx', index=False)
+dataiOS.insert(0, 'Date', now.strftime("%B %d, %Y"))
+dataiOS.to_excel('iOSratings.xlsx')

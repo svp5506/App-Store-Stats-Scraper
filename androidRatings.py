@@ -2,7 +2,6 @@ from bs4 import BeautifulSoup
 import requests
 import pandas as pd
 from datetime import datetime
-import concurrent.futures
 
 urlAndroid = [
     "https://play.google.com/store/apps/details?id=com.windstream.residential&hl=en_US&gl=US", #Windstream
@@ -58,7 +57,7 @@ def process_url(link):
     appName = appName.text
 
     temp_list = [None] * 8
-    temp_list[0] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")  # Date
+    temp_list[0] = datetime.now().strftime("%B %d, %Y")  # Date
     temp_list[6] = starRating  # Star Rating
     temp_list[7] = appName  # App Name
 
@@ -72,18 +71,13 @@ def process_url(link):
     return temp_list
 
 dataAndroid = []
-with concurrent.futures.ThreadPoolExecutor() as executor:
-    futures = []
-    for link in urlAndroid:
-        futures.append(executor.submit(process_url, link))
-    
-    for future in concurrent.futures.as_completed(futures):
-        temp_list = future.result()
-        dataAndroid.append(temp_list)
+for link in urlAndroid:
+    temp_list = process_url(link)
+    dataAndroid.append(temp_list)
 
 dataAndroid = pd.DataFrame(dataAndroid, columns=['Date_A', 'Android 5 Star Reviews', 'Android 4 Star Reviews', 'Android 3 Star Reviews', 'Android 2 Star Reviews', 'Android 1 Star Reviews', 'Android App Rating', 'App Name'])
 
 dataAndroid['Android Total Reviews'] = dataAndroid.loc[:, 'Android 5 Star Reviews':'Android 1 Star Reviews'].sum(1)
 dataAndroid = dataAndroid[['Date_A', 'App Name', 'Android App Rating', 'Android Total Reviews', 'Android 5 Star Reviews', 'Android 4 Star Reviews', 'Android 3 Star Reviews', 'Android 2 Star Reviews', 'Android 1 Star Reviews']]
 
-dataAndroid.to_excel('AndroidRatings.xlsx', index=False)
+dataAndroid.to_excel('AndroidRatings.xlsx')
