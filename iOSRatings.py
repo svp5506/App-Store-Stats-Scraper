@@ -132,11 +132,18 @@ dataiOS.to_excel("iOSratings.xlsx")
 today = date.today().strftime("%Y-%m-%d")
 unique_dataiOS = dataiOS[dataiOS["Detail Date"].str.startswith(today)].copy()
 
-unique_dataiOS.to_excel("iOSratings.xlsx")
+dataiOS.to_excel("iOSratings.xlsx")
 
-unique_dataiOS.to_sql(
-    "dataiOS", conn, if_exists="append", index=True
-)  # Append data to the table
+cursor.execute(f"SELECT * FROM dataiOS WHERE [Date] = '{now.strftime('%B %d, %Y')}'")
+existing_data = cursor.fetchall()
+
+if existing_data:
+    # Delete duplicate data for today
+    cursor.execute(f"DELETE FROM dataiOS WHERE [Date] = '{now.strftime('%B %d, %Y')}'")
+    conn.commit()
+
+# Insert new data
+unique_dataiOS.to_sql("dataiOS", conn, if_exists="append", index=True)
 
 conn.commit()
 conn.close()
