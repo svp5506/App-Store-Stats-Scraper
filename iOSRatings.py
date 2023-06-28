@@ -3,6 +3,7 @@ import requests
 import json
 import pandas as pd
 from datetime import datetime
+from datetime import date
 import sqlite3
 
 conn = sqlite3.connect("Database/app_store_stats.db")
@@ -128,6 +129,14 @@ dataiOS.insert(0, "Date", now.strftime("%B %d, %Y"))
 dataiOS.insert(0, "Detail Date", now.strftime("%Y-%m-%d %H:%M:%S"))
 dataiOS.to_excel("iOSratings.xlsx")
 
-dataiOS.to_sql("dataiOS", conn, if_exists="replace", index=True)
+today = date.today().strftime("%Y-%m-%d")
+unique_dataiOS = dataiOS[dataiOS["Detail Date"].str.startswith(today)].copy()
+
+unique_dataiOS.to_excel("iOSratings.xlsx")
+
+unique_dataiOS.to_sql(
+    "dataiOS", conn, if_exists="append", index=True
+)  # Append data to the table
+
 conn.commit()
 conn.close()
