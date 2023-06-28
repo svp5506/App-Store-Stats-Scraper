@@ -2,9 +2,6 @@ import pandas as pd
 from datetime import datetime
 import sqlite3
 
-# Connect to Database
-conn = sqlite3.connect("/Database/app_store_stats.db")
-
 # Read data from files with specified data types
 dataiOS = pd.read_excel("iOSratings.xlsx")
 dataAndroid = pd.read_excel("androidRatings.xlsx")
@@ -76,5 +73,3 @@ dataCombined = dataCombined[
 
 # Export to Excel
 dataCombined.to_excel("combinedRatings.xlsx", index=False)
-
-conn.close()

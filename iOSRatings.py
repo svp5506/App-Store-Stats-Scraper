@@ -128,6 +128,6 @@ dataiOS.insert(0, "Date", now.strftime("%B %d, %Y"))
 dataiOS.insert(0, "Detail Date", now.strftime("%Y-%m-%d %H:%M:%S"))
 dataiOS.to_excel("iOSratings.xlsx")
 
-dataiOS.to_sql("dataiOS", conn, if_exists="replace", index=False)
+dataiOS.to_sql("dataiOS", conn, if_exists="replace", index=True)
 conn.commit()
 conn.close()

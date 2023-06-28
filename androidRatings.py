@@ -152,6 +152,6 @@ dataAndroid = dataAndroid[
 
 dataAndroid.to_excel("AndroidRatings.xlsx")
 
-dataAndroid.to_sql("dataAndroid", conn, if_exists="replace", index=False)
+dataAndroid.to_sql("dataAndroid", conn, if_exists="replace", index=True)
 conn.commit()
 conn.close()
